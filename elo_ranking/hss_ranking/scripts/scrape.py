@@ -27,13 +27,16 @@ def simulate_season(df):
     for game in games:
         teams = get_teams(game)
         for team in teams:
-            team_elos[team] = EloRating(1200, K_VAL)
+            team_elos[team] = {}
+            team_elos[team]['wins'] = 0 
+            team_elos[team]['loses'] = 0 
+            team_elos[team]['elo'] = EloRating(1200, K_VAL)
 
     for index,row in df.iterrows():
         simulate_game(calculator, row, team_elos)
 
-    columns = ('team', 'elo', 'kfactor')
-    data = [(k, v.mean, v.k_factor) for k,v in team_elos.iteritems()]
+    columns = ('team', 'elo', 'wins', 'loses', 'kfactor')
+    data = [(k, v['elo'].mean, v['wins'], v['loses'], v['elo'].k_factor) for k,v in team_elos.iteritems()]
     team_df = pd.DataFrame(data, columns=columns)
 
     return team_df
@@ -48,8 +51,8 @@ def simulate_game(calculator, row, teams):
 
     team1_id = hash(team1)
     team2_id = hash(team2)
-    team1_elo = teams.get(team1)
-    team2_elo = teams.get(team2)
+    team1_elo = teams.get(team1, {}).get('elo')
+    team2_elo = teams.get(team2, {}).get('elo')
     if not team1_elo or not team2_elo:
         print "Couldn't match game"
         print row
@@ -57,10 +60,12 @@ def simulate_game(calculator, row, teams):
 
     if int(score1) > int(score2):
         rank = [1, 2]
-    elif int(score1) == int(score2):
-        rank = [1, 1]
+        teams[team1]['wins'] += 1
+        teams[team2]['loses'] += 1
     else:
         rank = [2, 1]
+        teams[team2]['wins'] += 1
+        teams[team1]['loses'] += 1
 
     game_info = EloGameInfo(1200, 25)
     team_info = Match(
@@ -71,8 +76,8 @@ def simulate_game(calculator, row, teams):
       rank)
 
     new_ratings = calculator.new_ratings(team_info, game_info)
-    teams[team1] = (new_ratings.rating_by_id(1))
-    teams[team2] = (new_ratings.rating_by_id(2))
+    teams[team1]['elo'] = (new_ratings.rating_by_id(1))
+    teams[team2]['elo'] = (new_ratings.rating_by_id(2))
 
 def get_page_count():
     url = "http://highschoolsports.mlive.com/sprockets/game_search_results/?config=3853&season=2327&sport=200&page={}".format(1)

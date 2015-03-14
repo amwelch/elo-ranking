@@ -15,7 +15,7 @@ def index(request):
     data = []
     rank = 1
     for index, row in df.iterrows():
-        data.append([rank, row[0], '10', '5', row[1]])
+        data.append([rank, row[0], row[2], row[3], row[1]])
         rank += 1
     context = RequestContext(request, {
         'team_rankings': data
