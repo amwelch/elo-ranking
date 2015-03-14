@@ -6,9 +6,29 @@ import arrow
 from skills.elo import EloCalculator, EloGameInfo, EloRating
 from skills import Match
 
+from hss_ranking.models import Game, Team, Conference
+
 import pandas as pd
 
 K_VAL = 25
+
+def get_team(name):
+    team = Team.objects.get_or_create(name=name)
+    team.save()
+    return team
+
+def add_game(team1, team2, score1, score2):
+
+    #Lookup the teams and create them if they don't exist
+    team1_obj = get_team(team1)
+    team2_obj = get_team(team2)
+    game = Game.objects.get_or_create(
+      team1=team_obj1, 
+      team2=team_obj2, 
+      score1=score2, 
+      score2=score2
+    )
+    game.save()
 
 def get_pages(text):
     page_rgx = "Page [0-9]+ of ([0-9]+)"
@@ -49,8 +69,6 @@ def simulate_game(calculator, row, teams):
         print "No scores"
         return
 
-    team1_id = hash(team1)
-    team2_id = hash(team2)
     team1_elo = teams.get(team1, {}).get('elo')
     team2_elo = teams.get(team2, {}).get('elo')
     if not team1_elo or not team2_elo:
@@ -79,6 +97,8 @@ def simulate_game(calculator, row, teams):
     teams[team1]['elo'] = (new_ratings.rating_by_id(1))
     teams[team2]['elo'] = (new_ratings.rating_by_id(2))
 
+    add_game(team1, team2, score1, score2)
+
 def get_page_count():
     url = "http://highschoolsports.mlive.com/sprockets/game_search_results/?config=3853&season=2327&sport=200&page={}".format(1)
     req = requests.get(url)
@@ -101,25 +121,26 @@ def parse_season(max_pages=None):
         time.sleep(1)
         page = BeautifulSoup.BeautifulSoup(req.text)
         table = page.find("div", {"class": "stats-table scores"})
-        for row in table.findAll('tr'):
-            if row.find('th'):
-                if not headings:
-                    headings = []
-                    cols = row.findAll('th')
-                    for col in cols:
-                        headings.append(col.text)
-            else:
-                cols = row.findAll('td')
-                content = []
-                for col in cols:
-                    divs = col.findAll('div')
-                    if not divs:
-                        #Some rows are just text
-                        text = col.text
-                    else:
-                        text = "\t".join([div.text for div in divs])
-                    content.append(text)
-                data_rows.append(tuple(content))
+        if table:
+             for row in table.findAll('tr'):
+                 if row.find('th'):
+                     if not headings:
+                         headings = []
+                         cols = row.findAll('th')
+                         for col in cols:
+                             headings.append(col.text)
+                 else:
+                     cols = row.findAll('td')
+                     content = []
+                     for col in cols:
+                         divs = col.findAll('div')
+                         if not divs:
+                             #Some rows are just text
+                             text = col.text
+                         else:
+                             text = "\t".join([div.text for div in divs])
+                         content.append(text)
+                     data_rows.append(tuple(content))
     
     games_df = pd.DataFrame(data_rows, columns=headings)
     teams_df = simulate_season(games_df) 

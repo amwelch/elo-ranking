@@ -10,7 +10,7 @@ import scripts.scrape as scrape
 
 def index(request):
     template = loader.get_template('hss_ranking/index.html')
-    df = scrape.parse_season(max_pages=5)
+    df = scrape.parse_season(max_pages=0)
 
     data = []
     rank = 1

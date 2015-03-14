@@ -15,13 +15,13 @@ class Sport(models.Model):
 # Create your models here.
 class Team(models.Model):
     name = models.CharField(max_length=MAX_TEAM_LENGTH)
-    conference = models.ForeignKey(Conference)
+#    conference = models.ForeignKey(Conference)
     elo = models.FloatField(default=DEFAULT_ELO)
     k_val = models.FloatField(default=DEFAULT_K_VAL)
     wins = models.IntegerField(default=0)
     loses = models.IntegerField(default=0)
     draws = models.IntegerField(default=0)
-    sport = models.ForeignKey(Sport)
+#    sport = models.ForeignKey(Sport)
 
 class Game(models.Model):
     team1 = models.ForeignKey(Team, related_name='team1')
