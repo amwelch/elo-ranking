@@ -55,7 +55,6 @@ def add_game(team1, team2, score1, score2):
     )
     if not exists:
         game.save()
-    else:
         print "New game"
 
 def get_pages(text):
@@ -74,7 +73,6 @@ def parse_games(df, team):
 
 def simulate_games(games):
     calculator = EloCalculator()
-    games = Game.objects.all()
     for game in games:
         simulate_game(calculator, game)
 
