@@ -8,9 +8,11 @@ DEFAULT_K_VAL = 25
 
 class Conference(models.Model):
     name = models.CharField(max_length=MAX_CONFERENCE_LENGTH)
+    site_id = models.IntegerField(default=0)
 
 class Sport(models.Model):
     name = models.CharField(max_length=MAX_SPORT_LENGTH)
+    site_id = models.IntegerField(default=0)
 
 # Create your models here.
 class Team(models.Model):
@@ -21,6 +23,7 @@ class Team(models.Model):
     wins = models.IntegerField(default=0)
     loses = models.IntegerField(default=0)
     draws = models.IntegerField(default=0)
+    site_id = models.IntegerField(default=0)
 #    sport = models.ForeignKey(Sport)
 
 class Game(models.Model):
@@ -28,3 +31,5 @@ class Game(models.Model):
     team2 = models.ForeignKey(Team, related_name='team2')
     score1 = models.IntegerField(default=0)
     score2 = models.IntegerField(default=0)
+    simulated = models.BooleanField(default=False)
+    site_id = models.IntegerField(default=0)

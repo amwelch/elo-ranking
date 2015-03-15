@@ -2,27 +2,36 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
+from hss_ranking.models import Team, Game
 import scripts.scrape as scrape
 
 # Create your views here.
+def fetch_teams(request):
+    teams = Team.objects.all()
+    scrape.fetch_teams(teams)
+    return HttpResponse("Done")
 
+def fetch(request):
+    print "Fetching"
+    df = scrape.fetch_season(max_pages=0)
+    return HttpResponse("Done")
 
+def parse(request):
+    print "Simulating"
+    games = Game.objects.all()
+    scrape.simulate_games(games)
+    return HttpResponse("Done")
 
 def index(request):
     template = loader.get_template('hss_ranking/index.html')
-    df = scrape.parse_season(max_pages=0)
-
     data = []
     rank = 1
-    for index, row in df.iterrows():
-        data.append([rank, row[0], row[2], row[3], row[1]])
+    teams = list(Team.objects.all())
+    teams.sort(key=lambda x: x.elo, reverse=True)
+    for team in teams:
+        data.append([rank, team.name, team.wins, team.loses, team.elo])
         rank += 1
     context = RequestContext(request, {
         'team_rankings': data
     })
-#    context = RequestContext(request, {
-#        'team_rankings': [
-#          [1, 'Huron', '4', '2', '1200'],
-#          [2, 'Pioneer', '2', '4', '1100']],
-#    })
     return HttpResponse(template.render(context))
