@@ -36,6 +36,14 @@ def get_team(name):
 
 def add_game(team1, team2, score1, score2):
 
+    #To avoid duplicates always sort by name to ensure that we don't get
+    #duplicate games
+    teams = [(team1, score1), (team2, score2)]
+    teams.sort(key = lambda x: x[0])
+    obj1, obj2 = teams
+    team1, score1 = obj1
+    team2, score2 = obj2
+
     #Lookup the teams and create them if they don't exist
     team1_obj = get_team(team1)
     team2_obj = get_team(team2)
@@ -78,6 +86,7 @@ def parse_game(row, team):
         team2 = row['OPPONENT'].replace('@', '')
     except ValueError:
         print "Couldn't unpack {}".format(row['TEAMS'])
+        return
 
     #Sigh, game results can come in many interesting flavors
     for k in ['SCORE', 'RESULT']:
