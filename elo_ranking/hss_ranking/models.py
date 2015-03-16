@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 MAX_TEAM_LENGTH = 256
 MAX_CONFERENCE_LENGTH = 256
@@ -33,3 +34,4 @@ class Game(models.Model):
     score2 = models.IntegerField(default=0)
     simulated = models.BooleanField(default=False)
     site_id = models.IntegerField(default=0)
+    date = models.DateTimeField(default=datetime.datetime.now())

@@ -12,7 +12,7 @@ from hss_ranking.models import Game, Team, Conference
 import pandas as pd
 
 K_VAL = 25
-SLEEP_TIME = 1
+SLEEP_TIME = .25
 
 def get_site_id(name):
     url = "http://highschoolsports.mlive.com/find_school/?q={}".format(name.lower())
@@ -34,7 +34,7 @@ def get_team(name):
     team.save()
     return team
 
-def add_game(team1, team2, score1, score2):
+def add_game(team1, team2, score1, score2, date):
 
     #To avoid duplicates always sort by name to ensure that we don't get
     #duplicate games
@@ -51,11 +51,22 @@ def add_game(team1, team2, score1, score2):
       team1=team1_obj, 
       team2=team2_obj, 
       score1=score1, 
-      score2=score2
+      score2=score2,
+      date=date.datetime
     )
     if not exists:
         game.save()
         print "New game"
+
+def extract_date(buf):
+    tm = arrow.utcnow()
+    for i in range(10):
+        year = tm.format('YYYY')
+        date = arrow.get("{}/{}".format(year, buf), "YYYY/MM/DD")
+        if date < arrow.utcnow():
+            return date
+        else:
+            tm = tm.replace(years=-1)
 
 def get_pages(text):
     page_rgx = "Page [0-9]+ of ([0-9]+)"
@@ -106,7 +117,15 @@ def parse_game(row, team):
     if '--' in score1 or '--' in score2:
         print "No scores"
         return
-    add_game(team1, team2, score1, score2)
+
+    try:
+        date_str = row['DATE']
+        date = extract_date(date_str)
+    except ValueError:
+        print "Could not parse {}".format(row['DATE'])
+        return
+
+    add_game(team1, team2, score1, score2, date)
 
 def simulate_game(calculator, game):
 
