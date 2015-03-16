@@ -22,6 +22,13 @@ def parse(request):
     scrape.simulate_games(games)
     return HttpResponse("Done")
 
+def team_drill(request):
+    template = loader.get_template('hss_ranking/team_drill.html')
+    context = RequestContext(request, {
+        'team_info': 'foo'
+    })
+    return HttpResponse(template.render(context))
+
 def index(request):
     template = loader.get_template('hss_ranking/index.html')
     data = []
