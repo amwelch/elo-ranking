@@ -100,7 +100,22 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#teams-table').DataTable();
+        var team_table = $('#teams-table').dataTable( {
+          "order": [[1, "asc"]],
+          "columnDefs": [
+            { 
+              "targets": [0],
+              "visible": false,
+              "searchable": false
+            }
+          ]
+        });
+        team_table.$('tr').click(function() {
+          var data = team_table.fnGetData(this);
+          var baseurl = './team_drill/';
+          var url = baseurl + data[0] + '/';
+          window.location.href = url;
+        });
         $('#schedule-table').DataTable();
     });
 </script>

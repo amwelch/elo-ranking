@@ -32,6 +32,7 @@
             <table id="teams-table" class="table table-striped">
               <thead>
                 <tr>
+                  <th>Id</th>
                   <th>Rank</th>
                   <th>Team</th>
                   <th>Wins</th>
@@ -42,9 +43,9 @@
               <tbody>
                 {% for r in team_rankings %}
                     {% for c in r %}
-                        {% cycle '<tr>' '' '' '' '' %}
+                        {% cycle '<tr>' '' '' '' '' '' %}
                            <td>{{c}}</td>
-                        {% cycle '' '' '' '' '</tr>' %}
+                        {% cycle '' '' '' '' '' '</tr>' %}
                     {% endfor %}
                 {% endfor %}
               </tbody>
