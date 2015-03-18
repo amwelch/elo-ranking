@@ -30,8 +30,19 @@ def team_dash(request):
     return HttpResponse(template.render(context))
 def team_drill(request):
     template = loader.get_template('hss_ranking/team_drill.html')
+    team = Team.objects.get(name="Ann Arbor Huron")
+    data = []
+    games = Game.objects.filter(team1=team) 
+    for game in games:
+        data.append([game.team1.name, game.team2.name, game.score1, game.score2])
     context = RequestContext(request, {
-        'team_info': 'foo'
+        'team_schedule': data
+    })
+    games = Game.objects.filter(team2=team)
+    for game in games:
+        data.append([game.team1.name, game.team2.name, game.score1, game.score2])
+    context = RequestContext(request, {
+        'team_schedule': data
     })
     return HttpResponse(template.render(context))
 

@@ -77,9 +77,11 @@
             <li><a href="">Another nav item</a></li>
           </ul>
         </div>
+        <div class="col-sm-9 col-md-10 col-sm-offset-3 col-md-offset-2">
 
-    {% block content %}{% endblock %}
+          {% block content %}{% endblock %}
 
+        </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -99,5 +101,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#teams-table').DataTable();
+        $('#schedule-table').DataTable();
     });
 </script>
