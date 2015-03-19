@@ -33,14 +33,13 @@ def team_drill(request, team_id):
     team = Team.objects.get(id=team_id)
     team_info = {}
     team_info['name'] = team.name
-    team_info['rank'] = team.rank
     data = []
-    games = Game.objects.filter(team1=team) 
+    games = Game.objects.filter(home=team) 
     for game in games:
-        data.append([game.team1.name, game.team2.name, game.score1, game.score2])
-    games = Game.objects.filter(team2=team)
+        data.append([game.home.name, game.away.name, game.score_home, game.score_away])
+    games = Game.objects.filter(away=team)
     for game in games:
-        data.append([game.team1.name, game.team2.name, game.score1, game.score2])
+        data.append([game.home.name, game.away.name, game.score_home, game.score_away])
     context = RequestContext(request, {
         'team_schedule': data,
         'team_info': team_info
@@ -54,7 +53,7 @@ def index(request):
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
-        data.append([rank, team.name, team.wins, team.loses, team.elo])
+        data.append([team.id, rank, team.name, team.wins, team.loses, team.elo])
         rank += 1
     context = RequestContext(request, {
         'team_rankings': data

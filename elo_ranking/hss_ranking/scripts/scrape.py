@@ -34,24 +34,19 @@ def get_team(name):
     team.save()
     return team
 
-def add_game(team1, team2, score1, score2, date):
+def add_game(home_name, away_name, score_home, score_away, date):
 
     #To avoid duplicates always sort by name to ensure that we don't get
     #duplicate games
-    teams = [(team1, score1), (team2, score2)]
-    teams.sort(key = lambda x: x[0])
-    obj1, obj2 = teams
-    team1, score1 = obj1
-    team2, score2 = obj2
 
     #Lookup the teams and create them if they don't exist
-    team1_obj = get_team(team1)
-    team2_obj = get_team(team2)
+    home = get_team(home_name)
+    away = get_team(away_name)
     game,exists = Game.objects.get_or_create(
-      team1=team1_obj, 
-      team2=team2_obj, 
-      score1=score1, 
-      score2=score2,
+      home=home, 
+      away=away, 
+      score_home=score_home, 
+      score_away=score_away,
       date=date.datetime
     )
     if not exists:
@@ -76,7 +71,13 @@ def get_pages(text):
     return 0
 
 def get_teams(string):
-    return string.replace('@', '').split('\t')
+    teams = string.split('\t')
+    for team in teams:
+        if '@' in team:
+            away = team.replace('@', '')
+        else:
+            home = team
+    return home,away
 
 def parse_games(df, team):
     for index,row in df.iterrows():
@@ -88,11 +89,18 @@ def simulate_games(games):
         simulate_game(calculator, game)
 
 def parse_game(row, team):
+
+    home_first = True
     try:
-        team1, team2 = get_teams(row['TEAMS'])
+        home, away = get_teams(row['TEAMS'])
     except KeyError:
-        team1 = team.name
-        team2 = row['OPPONENT'].replace('@', '')
+        if '@' in row['OPPONENT']:
+            home_first = False
+            home = row['OPPONENT'].replace('@', '')
+            away = team.name
+        else:
+            away = row['OPPONENT'].replace('@', '')
+            home = team.name
     except ValueError:
         print "Couldn't unpack {}".format(row['TEAMS'])
         return
@@ -113,6 +121,13 @@ def parse_game(row, team):
             print "Couldn't unpack score {}".format(row[k])
             return
 
+    if home_first:
+        home_score = score1
+        away_score = score2
+    else:
+        away_score = score1
+        home_score = score2
+
     #Game not recorded
     if '--' in score1 or '--' in score2:
         print "No scores"
@@ -125,42 +140,42 @@ def parse_game(row, team):
         print "Could not parse {}".format(row['DATE'])
         return
 
-    add_game(team1, team2, score1, score2, date)
+    add_game(home, away, home_score, away_score, date)
 
 def simulate_game(calculator, game):
 
     if game.simulated:
         return
 
-    team1 = game.team1
-    team2 = game.team2
+    home = game.home
+    away = game.away
 
-    if game.score1 > game.score2:
+    if game.home_score > game.away_score:
         rank = [1, 2]
-        team1.wins += 1
-        team2.loses += 1
+        home.wins += 1
+        away.loses += 1
     else:
         rank = [2, 1]
-        team1.loses += 1
-        team2.wins += 1
+        home.loses += 1
+        away.wins += 1
 
     game_info = EloGameInfo(1200, 25)
     team_info = Match(
       [ 
-        {1: (team1.elo, team1.k_val)},
-        {2: (team2.elo, team2.k_val)}
+        {1: (home.elo, home.k_val)},
+        {2: (away.elo, taway.k_val)}
       ],
       rank)
 
     new_ratings = calculator.new_ratings(team_info, game_info)
-    team1.elo = new_ratings.rating_by_id(1).mean
-    team2.elo = new_ratings.rating_by_id(2).mean
-    team1.k_val = new_ratings.rating_by_id(1).k_factor
-    team2.k_val = new_ratings.rating_by_id(2).k_factor
-    print "simulated {} vs {} [{} - {}]".format(team1.name, team2.name, game.score1, game.score2)   
+    home.elo = new_ratings.rating_by_id(1).mean
+    away.elo = new_ratings.rating_by_id(2).mean
+    home.k_val = new_ratings.rating_by_id(1).k_factor
+    away.k_val = new_ratings.rating_by_id(2).k_factor
+    print "simulated {} vs {} [{} - {}]".format(home.name, away.name, game.home_score, game.away_score)   
     game.simulated=True
-    team1.save()
-    team2.save()
+    home.save()
+    away.save()
     game.save()
 
 def get_page_count():

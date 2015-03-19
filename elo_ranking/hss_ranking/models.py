@@ -28,10 +28,10 @@ class Team(models.Model):
 #    sport = models.ForeignKey(Sport)
 
 class Game(models.Model):
-    team1 = models.ForeignKey(Team, related_name='team1')
-    team2 = models.ForeignKey(Team, related_name='team2')
-    score1 = models.IntegerField(default=0)
-    score2 = models.IntegerField(default=0)
+    home = models.ForeignKey(Team, related_name='team1')
+    away = models.ForeignKey(Team, related_name='team2')
+    score_home = models.IntegerField(default=0)
+    score_away = models.IntegerField(default=0)
     simulated = models.BooleanField(default=False)
     site_id = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.datetime.now())
