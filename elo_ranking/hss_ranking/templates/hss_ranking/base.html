@@ -60,7 +60,7 @@
           <ul class="nav nav-sidebar">
             {% for category in sidebar_data %}
               <li>
-                <select title = {{category.name}} id="select-{{category.name}}" data-live-search="true" class="selectpicker" data-width="100%" data-size="5">
+                <select multiple data-max-options="1" title="{{category.name}}" id="select-{{category.name}}" data-live-search="true" class="selectpicker" data-width="100%" data-size="5">
                   {% for option in category.options %}
                     <option>{{option.name}}</option>
                   {% endfor %}
@@ -78,6 +78,7 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/docs.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
@@ -88,7 +89,9 @@
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css"></script>
     <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/i18n/defaults-*.min.js"></script>
+<!--    <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/i18n/defaults-*.min.js"></script> -->
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+     <script src="/static/js/bootstrap-datepaginator.min.js"></script>
     {% block extras %}{% endblock %}
   </body>
 </html>
@@ -112,5 +115,6 @@
           window.location.href = url;
         });
         $('#schedule-table').DataTable();
+        $('#paginator').datepaginator();
     });
 </script>

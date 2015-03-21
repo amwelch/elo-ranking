@@ -1,8 +1,8 @@
 {% extends "hss_ranking/base.html" %}
 
 {% block header-content %}
-        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
-          <h1 class="page-header">
+        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-7 col-md-7 col-lg-7 main">
+          <h2 class="page-header">
               {% load django_bootstrap_breadcrumbs %}
               {% block breadcrumbs %}
                   {% if state %}
@@ -19,7 +19,10 @@
                   {% endif %}
               {% endblock %}
               {% render_breadcrumbs %}
-          </h1>
+          </h2>
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4 main">
+          <div id="paginator"></div>
         </div>
         <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
           <div class="row placeholders">
