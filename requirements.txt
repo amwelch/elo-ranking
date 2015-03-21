@@ -1,1 +1,3 @@
 django-twitter-bootstrap==3.3.0
+django-bootstrap-breadcrumbs
+django-simple-history

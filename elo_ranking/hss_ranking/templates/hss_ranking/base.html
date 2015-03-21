@@ -58,13 +58,15 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Sport<span class="sr-only">(current)</span></a></li>
-            <li><a href="#">State</a></li>
-          </ul>
-          <ul class="nav nav-sidebar">
-            <li><a href="">Division</a></li>
-            <li><a href="">Conference</a></li>
-            <li><a href="">School</a></li>
+            {% for category in sidebar_data %}
+              <li>
+                <select title = {{category.name}} id="select-{{category.name}}" data-live-search="true" class="selectpicker" data-width="100%" data-size="5">
+                  {% for option in category.options %}
+                    <option>{{option.name}}</option>
+                  {% endfor %}
+                </select>
+              </li>
+            {% endfor %}
           </ul>
         </div>
         <div class="col-sm-9 col-md-10 col-sm-offset-3 col-md-offset-2">
@@ -84,6 +86,9 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
     <!-- DataTables -->
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css"></script>
+    <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/i18n/defaults-*.min.js"></script>
     {% block extras %}{% endblock %}
   </body>
 </html>

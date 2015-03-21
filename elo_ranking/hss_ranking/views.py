@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
-from hss_ranking.models import Team, Game
+from hss_ranking.models import Team, Game, Conference
 import scripts.scrape as scrape
 
 # Create your views here.
@@ -96,6 +96,36 @@ def index(request):
       }
     ]
 
+    sidebar_data = [
+      {
+        "name": "Sport",
+        "options": [
+          {
+            "name": "Men's Basketball"
+          }
+        ]
+      },
+      {
+        "name": "State",
+        "options": [
+          {
+            "name": "Michigan"
+          }
+        ]
+      },
+      {
+        "name": "Division",
+        "options": [
+          {
+            "name": "1A"
+          }
+        ]
+      }
+    ]
+
+    sidebar_data.append(make_options(Conference.objects.all(), "Conference"))
+    sidebar_data.append(make_options(Team.objects.all(), "Team"))
+
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
@@ -107,6 +137,16 @@ def index(request):
         'sport': sport,
         'division': division,
         'conference': conference,
-        'header_stats': stats
+        'header_stats': stats,
+        'sidebar_data': sidebar_data
     })
     return HttpResponse(template.render(context))
+
+def make_options(objs, name):
+    ret = {
+        "name": name,
+        "options": []
+    }
+    for obj in objs:
+        ret['options'].append({'name': obj.name, 'id': obj.id})
+    return ret
