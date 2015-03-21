@@ -29,12 +29,18 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+    'django.contrib.auth.context_processors.auth',
+)
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django_bootstrap_breadcrumbs',
     'django.contrib.staticfiles',
     'twitter_bootstrap',
     'hss_ranking',

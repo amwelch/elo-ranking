@@ -72,6 +72,9 @@ def get_pages(text):
 
 def get_teams(string):
     teams = string.split('\t')
+    if len(teams) != 2:
+        return
+
     for team in teams:
         if '@' in team:
             away = team.replace('@', '')
@@ -101,7 +104,7 @@ def parse_game(row, team):
         else:
             away = row['OPPONENT'].replace('@', '')
             home = team.name
-    except ValueError:
+    except (TypeError, ValueError) as e:
         print "Couldn't unpack {}".format(row['TEAMS'])
         return
 
@@ -150,7 +153,7 @@ def simulate_game(calculator, game):
     home = game.home
     away = game.away
 
-    if game.home_score > game.away_score:
+    if game.score_home > game.score_away:
         rank = [1, 2]
         home.wins += 1
         away.loses += 1
@@ -163,7 +166,7 @@ def simulate_game(calculator, game):
     team_info = Match(
       [ 
         {1: (home.elo, home.k_val)},
-        {2: (away.elo, taway.k_val)}
+        {2: (away.elo, away.k_val)}
       ],
       rank)
 
@@ -172,7 +175,7 @@ def simulate_game(calculator, game):
     away.elo = new_ratings.rating_by_id(2).mean
     home.k_val = new_ratings.rating_by_id(1).k_factor
     away.k_val = new_ratings.rating_by_id(2).k_factor
-    print "simulated {} vs {} [{} - {}]".format(home.name, away.name, game.home_score, game.away_score)   
+    print "simulated {} vs {} [{} - {}]".format(home.name, away.name, game.score_home, game.score_away)   
     game.simulated=True
     home.save()
     away.save()

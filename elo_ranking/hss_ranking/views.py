@@ -50,12 +50,34 @@ def index(request):
     template = loader.get_template('hss_ranking/index.html')
     data = []
     rank = 1
+
+    state = {
+        "name": "Michigan",
+        "id": 0
+    }
+    sport = {
+        "name": "Men's Basketball",
+        "id": 0
+    }
+    division = {
+        "name": "1A",
+        "id": 0
+    }
+    conference = {
+        "name": "SEC",
+        "id": 0
+    }
+
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
         data.append([team.id, rank, team.name, team.wins, team.loses, team.elo])
         rank += 1
     context = RequestContext(request, {
-        'team_rankings': data
+        'team_rankings': data,
+        'state': state,
+        'sport': sport,
+        'division': division,
+        'conference': conference
     })
     return HttpResponse(template.render(context))

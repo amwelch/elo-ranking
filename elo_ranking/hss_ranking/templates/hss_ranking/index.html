@@ -1,8 +1,27 @@
 {% extends "hss_ranking/base.html" %}
 
-{% block content %}
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Dashboard</h1>
+{% block header-content %}
+        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
+          <h1 class="page-header">
+              {% load django_bootstrap_breadcrumbs %}
+              {% block breadcrumbs %}
+                  {% if state %}
+                      {% breadcrumb state.name state.id%}
+                      {% if division %}
+                           {% breadcrumb division.name division.id %}
+                           {% if conference %}
+                               {% breadcrumb conference.name conference.id %}
+                               {% if team %}
+                                   {% breadcrumb team.name team.id %}
+                               {% endif %}
+                           {% endif %}
+                      {% endif %}
+                  {% endif %}
+              {% endblock %}
+              {% render_breadcrumbs %}
+          </h1>
+        </div>
+        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
 
           <div class="row placeholders">
             <div class="col-xs-6 col-sm-3 placeholder">
@@ -26,8 +45,11 @@
               <span class="text-muted">Something else</span>
             </div>
           </div>
+        </div>
+        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
 
-          <h2 class="sub-header">Teams</h2>
+{% block content %}
+{% endblock %}
           <div class="table-responsive">
             <table id="teams-table" class="table table-striped">
               <thead>
