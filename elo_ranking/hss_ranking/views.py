@@ -18,7 +18,7 @@ def fetch(request):
 
 def parse(request):
     print "Simulating"
-    games = Game.objects.all()
+    games = Game.objects.filter(simulated=False).order_by("date")
     scrape.simulate_games(games)
     return HttpResponse("Done")
 
@@ -68,6 +68,34 @@ def index(request):
         "id": 0
     }
 
+    #Placeholder stats
+    stats = [
+      {
+        "delta": "up",
+        "title": "Spread",
+        "measure": "20.2",
+        "delta_measure": "2.2"
+      },
+      {
+        "delta": "null",
+        "title": "Rank",
+        "measure": "1",
+        "delta_measure": "0.0"
+      },
+      {
+        "delta": "up",
+        "title": "Games",
+        "measure": "724",
+        "delta_measure": "20"
+      },
+      {
+        "delta": "down",
+        "title": "Elo",
+        "measure": "1151.124",
+        "delta_measure": "14.5"
+      }
+    ]
+
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
@@ -78,6 +106,7 @@ def index(request):
         'state': state,
         'sport': sport,
         'division': division,
-        'conference': conference
+        'conference': conference,
+        'header_stats': stats
     })
     return HttpResponse(template.render(context))

@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django_bootstrap_breadcrumbs',
     'django.contrib.staticfiles',
     'twitter_bootstrap',
+    'simple_history',
     'hss_ranking',
 )
 
@@ -54,6 +55,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 )
 
 ROOT_URLCONF = 'elo_ranking.urls'

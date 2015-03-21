@@ -23,19 +23,25 @@ def get_site_id(name, field="id"):
             return url.get(field)     
 
 def get_conference(team, sport="boysbasketball"):
+    print "Looking up conference for {}".format(team.name)
     school_url = get_site_id(team.name, field="url")
-    url = "http://highschoolsports.mlive.com{}{}/".format(school_url,sport)
-    req = requests.get(url)
     name = None
-    page = BeautifulSoup.BeautifulSoup(req.text)
-    if page:
-        table = page.find('div', {'class': 'stats-table'})
-        if table:
-            conference = page.find('caption')
-            name = conference.text
+    if school_url:
+        url = "http://highschoolsports.mlive.com{}{}/".format(school_url,sport)
+        req = requests.get(url)
+        time.sleep(SLEEP_TIME)
+        page = BeautifulSoup.BeautifulSoup(req.text)
+        if page:
+            print "Got page"
+            table = page.find('div', {'class': 'stats-table standings'})
+            if table:
+                print "Got table"
+                conference = page.find('caption')
+                name = conference.text
     if not name:
        name = "placeholder"
 
+    print "Creating {}".format(name)
     conf,created = Conference.objects.get_or_create(name=name)
     return conf
 
@@ -190,12 +196,16 @@ def simulate_game(calculator, game):
       ],
       rank)
 
+    #Set date for historical queries
+    home.date = game.date
+    away.date = game.date
+
     new_ratings = calculator.new_ratings(team_info, game_info)
     home.elo = new_ratings.rating_by_id(1).mean
     away.elo = new_ratings.rating_by_id(2).mean
     home.k_val = new_ratings.rating_by_id(1).k_factor
     away.k_val = new_ratings.rating_by_id(2).k_factor
-    print "simulated {} vs {} [{} - {}]".format(home.name, away.name, game.score_home, game.score_away)   
+    print "simulated {} vs {} [{} - {}] {}".format(home.name, away.name, game.score_home, game.score_away, game.date)   
     game.simulated=True
     home.save()
     away.save()
@@ -239,6 +249,11 @@ def parse_score_table(text, team):
     parse_games(games_df, team) 
     
 
+def encode_team(name):
+    name = name.replace(' ', '+')
+    name = urllib.quote_plus(name)
+    return name
+
 def fetch_teams(teams):
     for team in teams:
         get_team(team.name)
@@ -246,8 +261,7 @@ def fetch_teams(teams):
             continue
         base_url = "http://highschoolsports.mlive.com/boysbasketball/schedule/"
         params="game_search_start=&game_search_end=&game_search_school_search={}&game_search_grouping=&game_search_school_search_id_holder={}"
-        name = team.name.replace(' ', '+')
-        name = urllib.quote_plus(name)
+        name = encode_team(team.name)
         params = params.format(name,team.site_id)
         url = "{}?{}".format(base_url, params)
         #Uses + for space
@@ -258,7 +272,6 @@ def fetch_teams(teams):
 
 def fetch_season(max_pages=None):
     num_pages = get_page_count()
-    num_pages = 2
     for page_num in range(1,num_pages):
         if max_pages and page_num > max_pages:
             break

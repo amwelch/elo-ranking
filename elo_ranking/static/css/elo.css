@@ -1,0 +1,52 @@
+.circle {
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 50%;
+  width: 100%;
+  position: relative;
+}
+
+.circle-up {
+  border: 2px solid #3c763d;
+}
+.circle-down {
+  border: 2px solid #a94442;
+}
+.circle-neutral {
+  border: 2px solid #31708f;
+}
+
+.circle-solid{
+  background-color: whitesmoke;
+}
+
+.circle:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.circle-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+}
+
+.score-text {
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 1em;
+  line-height: 1em;
+  font-size: 1em;
+  height: 2vw;
+  line-height: 2vw;
+  font-size: 2vw;
+}
+

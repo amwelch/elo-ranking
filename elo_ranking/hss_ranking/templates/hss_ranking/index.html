@@ -22,28 +22,48 @@
           </h1>
         </div>
         <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
-
           <div class="row placeholders">
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Label</h4>
-              <span class="text-muted">Something else</span>
-            </div>
+              {% for stat in header_stats %}
+                <div class="col-xs-3 col-sm-3" "col-md-3" "col-lg-3">
+                  {% if stat.delta == "up" %}
+                    <div class="circle circle-border circle-up">
+                      <div class="circle-inner">
+                        <div class="score-text">
+                          <span class="text-info">{{stat.title}}</span>
+                          <br>
+                          <span class="text-info">{{stat.measure}}</span>
+                          <br>
+                          <span class="text-success"><i class="glyphicon glyphicon-arrow-up"></i>{{stat.delta_measure}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  {% elif stat.delta == "down" %}
+                    <div class="circle circle-border circle-down">
+                      <div class="circle-inner">
+                        <div class="score-text">
+                          <span class="text-info">{{stat.title}}</span>
+                          <br>
+                          <span class="text-info">{{stat.measure}}</span>
+                          <br>
+                          <span class="text-danger"><i class="glyphicon glyphicon-arrow-down"></i>{{stat.delta_measure}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  {% else %}
+                    <div class="circle circle-border circle-neutral">
+                      <div class="circle-inner">
+                        <div class="score-text">
+                          <span class="text-info">{{stat.title}}</span>
+                          <br>
+                          <span class="text-info">{{stat.measure}}</span>
+                          <br>
+                          <span class="text-info"><i class="glyphicon glyphicon-minus"></i>{{stat.delta_measure}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
           </div>
         </div>
         <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">

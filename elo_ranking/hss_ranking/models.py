@@ -1,4 +1,5 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 import datetime
 
 MAX_TEAM_LENGTH = 256
@@ -24,6 +25,8 @@ class Conference(models.Model):
 
 # Create your models here.
 class Team(models.Model):
+    history = HistoricalRecords()
+    date = models.DateTimeField(default=datetime.datetime.fromtimestamp(0))
     conference = models.ForeignKey(Conference, blank=True, null=True)
     name = models.CharField(max_length=MAX_TEAM_LENGTH)
     elo = models.FloatField(default=DEFAULT_ELO)
@@ -40,4 +43,4 @@ class Game(models.Model):
     score_away = models.IntegerField(default=0)
     simulated = models.BooleanField(default=False)
     site_id = models.IntegerField(default=0)
-    date = models.DateTimeField(default=datetime.datetime.now())
+    date = models.DateTimeField(default=datetime.datetime.fromtimestamp(0))
