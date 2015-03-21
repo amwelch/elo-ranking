@@ -14,13 +14,30 @@ import pandas as pd
 K_VAL = 25
 SLEEP_TIME = .25
 
-def get_site_id(name):
+def get_site_id(name, field="id"):
     url = "http://highschoolsports.mlive.com/find_school/?q={}".format(name.lower())
     r = requests.get(url)
     urls = r.json()
     for url in urls:
         if url.get("name").lower() == name.lower():
-            return url.get("id")     
+            return url.get(field)     
+
+def get_conference(team, sport="boysbasketball"):
+    school_url = get_site_id(team.name, field="url")
+    url = "http://highschoolsports.mlive.com{}{}/".format(school_url,sport)
+    req = requests.get(url)
+    name = None
+    page = BeautifulSoup.BeautifulSoup(req.text)
+    if page:
+        table = page.find('div', {'class': 'stats-table'})
+        if table:
+            conference = page.find('caption')
+            name = conference.text
+    if not name:
+       name = "placeholder"
+
+    conf,created = Conference.objects.get_or_create(name=name)
+    return conf
 
 def get_team(name):
     team,exists = Team.objects.get_or_create(name=name)
@@ -30,6 +47,9 @@ def get_team(name):
             team.site_id = site_id
         else:
             print "Could not get id for {}".format(team.name)
+
+    if not team.conference:
+        team.conference = get_conference(team)
 
     team.save()
     return team
@@ -238,6 +258,7 @@ def fetch_teams(teams):
 
 def fetch_season(max_pages=None):
     num_pages = get_page_count()
+    num_pages = 2
     for page_num in range(1,num_pages):
         if max_pages and page_num > max_pages:
             break
