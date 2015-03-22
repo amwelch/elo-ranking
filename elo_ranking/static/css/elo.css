@@ -109,6 +109,10 @@ nav a:hover {
 	border: 1px solid #ddd;
 	/*border-bottom: 3px solid #b59c8d;*/
 }
+
+.btn-sidebar {
+	margin-right: 10px;
+}
 .row .sidebar {
 	background-color: #f7f6f2;
 	border: 0px;
@@ -121,3 +125,6 @@ li.open >a.dropdown-toggle.nav-element, li.open >a.dropdown-togglenav-element:ho
 	background-color: #783919;
 }
 
+div .btn {
+	margin-bottom: 10px;
+}
