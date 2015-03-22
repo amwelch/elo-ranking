@@ -91,7 +91,7 @@
     <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
 <!--    <script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/i18n/defaults-*.min.js"></script> -->
     <script src="/static/js/bootstrap-datepicker.min.js"></script>
-     <script src="/static/js/bootstrap-datepaginator.min.js"></script>
+     <script src="/static/js/bootstrap-datepaginator.js"></script>
     {% block extras %}{% endblock %}
   </body>
 </html>
@@ -115,6 +115,18 @@
           window.location.href = url;
         });
         $('#schedule-table').DataTable();
-        $('#paginator').datepaginator();
+        var pag_options = {
+          offDays: "Mon,Tue,Wed,Thu,Fri,Sat",
+          hideOffDays: true,
+          textSelected: "dddd<br/>Do, MMMM YYYY",
+          showStartOfWeek: false,
+          endDate: "{{ endDate }}",
+          selectedDate: "{{endDate}}",
+          showCalendar: false,
+          size: "small"
+        };
+        console.log(pag_options);
+        $('#paginator').datepaginator(pag_options);
+//        $('#paginator').datepaginator(pag_options);
     });
 </script>

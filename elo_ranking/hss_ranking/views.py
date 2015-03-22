@@ -138,6 +138,7 @@ def index(request):
         'division': division,
         'conference': conference,
         'header_stats': stats,
+        'endDate': '2015-03-22',
         'sidebar_data': sidebar_data
     })
     return HttpResponse(template.render(context))
