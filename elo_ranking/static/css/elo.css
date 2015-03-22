@@ -50,3 +50,74 @@
   font-size: 2vw;
 }
 
+body {
+  font-family: Ubuntu, serif !important;
+  margin: 0;
+  background-color: #f7f6f2 !important;
+}
+.navbar-fixed-top {
+	color: wheat;
+}
+div.navbar-fixed-top {
+	color:wheat;
+	border:0px;
+	background-color: #683919;
+}
+.navbar-fixed-top .navbar-header .navbar-brand, .navbar-fixed-top .navbar-header .navbar-brand:hover {
+	color: wheat;
+}
+.navbar-fixed-top li > a {
+	color: wheat;
+	border:0px;
+	border-width:0px;
+}
+ul.nav.navbar-right li > a:hover, ul.nav.navbar-right li > a:active, ul.nav.navbar-right li > a:focus {
+	background-color: #783919;
+}
+
+ul.nav.nav-sidebar li > a, ul.nav.nav-sidebar li > a:hover, ul.nav.nav-sidebar li > a:active {
+	color: #783919;
+	border-right: 5px solid wheat;
+}
+
+body div.main ul.nav.nav-sidebar li > a:hover, body div ul.nav.nav-sidebar li > a:active {
+	background-color:#ddd;
+}
+
+
+.row .nav-sidebar > .active > a, .row .nav-sidebar > .active > a:hover, .row .nav-sidebar > .active > a:active {
+	border: 0px;
+	border-right: 5px solid #683919;
+	color: #683919;
+	background-color: #f7f6f2;
+
+}
+nav a {
+	color: #542b14;
+	text-decoration: none;
+	padding: 10px;
+	border: 1px solid transparent;
+	margin-right: 10px;
+}
+nav a.active {
+	background-color: #f7f6f2;
+	border: 1px solid #ddd;
+}
+nav a:hover {
+	color: #542b14;
+	text-decoration: none;
+	border: 1px solid #ddd;
+	/*border-bottom: 3px solid #b59c8d;*/
+}
+.row .sidebar {
+	background-color: #f7f6f2;
+	border: 0px;
+}
+
+.row .main {
+	background-color: #f7f6f2;
+}
+li.open >a.dropdown-toggle.nav-element, li.open >a.dropdown-togglenav-element:hover, li.open >a.dropdown-toggle.nav-element:focus {
+	background-color: #783919;
+}
+
