@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     url(r'^team_dash$', views.team_dash, name='drill'),
     url(r'^sim$', views.parse, name='parse'),
     url(r'^$', views.index, name='index'),
-    url(r'^/team/(?P<team_id>\d+)/$', views.team_drill, name='drill')
+    url(r'^test$', views.test, name='test'),
+    url(r'^team/(?P<team_id>\d+)/$', views.team_drill, name='drill')
 )

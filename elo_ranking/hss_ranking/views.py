@@ -1,15 +1,31 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext, loader
+from django.db.models import Max
 
 from hss_ranking.models import Team, Game, Conference
 import scripts.scrape as scrape
+import arrow
+import itertools
 
 # Create your views here.
 def fetch_teams(request):
     teams = Team.objects.all()
     scrape.fetch_teams(teams)
     return HttpResponse("Done")
+
+def test(request):
+    date = arrow.utcnow().datetime
+    fetch_objs_before(Team, date)
+
+def fetch_objs_before(cls, date):
+    objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
+    rs = []
+    for obj in objs:
+        tmp = cls.history.filter(date=obj['max_date'], name=obj['name'])
+        rs.append(tmp)
+    result_list = list(itertools.chain(*rs))
+    return result_list
 
 def fetch(request):
     print "Fetching"
