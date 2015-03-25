@@ -85,56 +85,7 @@ def team_drill(request, team_id):
     })
     return HttpResponse(template.render(context))
 
-def index(request):
-    template = loader.get_template('hss_ranking/index.html')
-    data = []
-    rank = 1
-
-    state = {
-        "name": "Michigan",
-        "id": 0
-    }
-    sport = {
-        "name": "Men's Basketball",
-        "id": 0
-    }
-    division = {
-        "name": "1A",
-        "id": 0
-    }
-    conference = {
-        "name": "SEC",
-        "id": 0
-    }
-
-    #Placeholder stats
-    stats = [
-      {
-        "delta": "up",
-        "title": "Spread",
-        "measure": "20.2",
-        "delta_measure": "2.2"
-      },
-      {
-        "delta": "null",
-        "title": "Rank",
-        "measure": "1",
-        "delta_measure": "0.0"
-      },
-      {
-        "delta": "up",
-        "title": "Games",
-        "measure": "724",
-        "delta_measure": "20"
-      },
-      {
-        "delta": "down",
-        "title": "Elo",
-        "measure": "1151.124",
-        "delta_measure": "14.5"
-      }
-    ]
-
+def generate_sidebar_options():
     sidebar_data = [
       {
         "name": "Sport",
@@ -164,22 +115,86 @@ def index(request):
 
     sidebar_data.append(make_options(Conference.objects.all(), "Conference"))
     sidebar_data.append(make_options(Team.objects.all(), "Team"))
+    return sidebar_data
+
+def general_context():
+    state = {
+        "name": "Michigan",
+        "id": 0
+    }
+    sport = {
+        "name": "Men's Basketball",
+        "id": 0
+    }
+    division = {
+        "name": "1A",
+        "id": 0
+    }
+    conference = {
+        "name": "SEC",
+        "id": 0
+    }
+
+    stats = get_stats()
+
+    ret = {
+        'sidebar_data': generate_sidebar_options(),
+        'state': state,
+        'sport': sport,
+        'division': division,
+        'conference': conference,
+        'header_stats': get_stats()
+    }
+    return ret
+
+def get_stats():
+    #Placeholder stats
+    stats = [
+      {
+        "delta": "up",
+        "title": "Spread",
+        "measure": "20.2",
+        "delta_measure": "2.2"
+      },
+      {
+        "delta": "null",
+        "title": "Rank",
+        "measure": "1",
+        "delta_measure": "0.0"
+      },
+      {
+        "delta": "up",
+        "title": "Games",
+        "measure": "724",
+        "delta_measure": "20"
+      },
+      {
+        "delta": "down",
+        "title": "Elo",
+        "measure": "1151.124",
+        "delta_measure": "14.5"
+      }
+    ]
+    return stats
+
+def index(request):
+    template = loader.get_template('hss_ranking/index.html')
+    data = []
+    rank = 1
+
 
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
         data.append([team.id, rank, team.name, team.wins, team.loses, team.elo])
         rank += 1
-    context = RequestContext(request, {
+    
+    context_data = general_context()
+    context_data.update({
         'team_rankings': data,
-        'state': state,
-        'sport': sport,
-        'division': division,
-        'conference': conference,
-        'header_stats': stats,
-        'endDate': '2015-03-22',
-        'sidebar_data': sidebar_data
-    })
+        'endDate': '2015-03-22'
+     })
+    context = RequestContext(request, context_data)
     return HttpResponse(template.render(context))
 
 def make_options(objs, name):
