@@ -8,6 +8,8 @@ import scripts.scrape as scrape
 import arrow
 import itertools
 
+import pandas as pd
+
 # Create your views here.
 def fetch_teams(request):
     teams = Team.objects.all()
@@ -15,8 +17,29 @@ def fetch_teams(request):
     return HttpResponse("Done")
 
 def test(request):
-    date = arrow.utcnow().datetime
-    fetch_objs_before(Team, date)
+    date = arrow.utcnow()
+    objs = fetch_objs_before(Team, date.datetime)
+    df = load_dataframe(objs)
+    before =fetch_objs_before(Team, date.replace(days=-7).datetime)
+    
+
+def load_dataframe(qs):
+    '''
+    QuerySet to dataframe
+    '''
+
+#    attrs = Team._meta.get_all_field_names()
+    #XXX temporary hack until I flush and migrate the database
+    attrs = [x for x in qs[0]._meta.get_all_field_names() if 'history' not in x]
+    rs=[[getattr(obj, attr) for attr in attrs if 'history' not in attr] for obj in qs]
+    return pd.DataFrame.from_records(rs, columns = attrs)
+
+#def team_deltas(before, after):
+    
+
+def fetch_teams(date):
+    prev = date.replace(days=-7)
+    prev_set = fetch_objs_before(Team, prev.datetime)
 
 def fetch_objs_before(cls, date):
     objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
