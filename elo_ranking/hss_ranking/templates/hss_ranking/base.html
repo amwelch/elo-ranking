@@ -30,7 +30,7 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body style="display:none">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
@@ -130,5 +130,8 @@
         console.log(pag_options);
         $('#paginator').datepaginator(pag_options);
 //        $('#paginator').datepaginator(pag_options);
+        $(window).load(function() {
+            $("body").fadeIn("slow");
+        });
     });
 </script>
