@@ -179,19 +179,22 @@ def get_stats():
 
 def index(request):
     template = loader.get_template('hss_ranking/index.html')
-    data = []
+    rows = []
     rank = 1
 
 
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
-        data.append([team.id, rank, team.name, team.wins, team.loses, team.elo])
+        rows.append([team.id, rank, team.name, team.wins, team.loses, team.elo])
         rank += 1
-    
+    table = {}
+    table['columns'] = ['Id', 'Rank', 'Name', 'Wins', 'Loses', 'Elo']
+    table['rows'] = rows   
+
     context_data = general_context()
     context_data.update({
-        'team_rankings': data,
+        'table': table,
         'endDate': '2015-03-22'
      })
     context = RequestContext(request, context_data)

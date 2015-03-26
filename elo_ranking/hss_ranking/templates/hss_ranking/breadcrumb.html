@@ -1,0 +1,20 @@
+        <div class="col-sm-7 col-md-7 col-lg-7 main">
+          <h2 class="page-header">
+              {% load django_bootstrap_breadcrumbs %}
+              {% block breadcrumbs %}
+                  {% if state %}
+                      {% breadcrumb state.name state.id%}
+                      {% if division %}
+                           {% breadcrumb division.name division.id %}
+                           {% if conference %}
+                               {% breadcrumb conference.name conference.id %}
+                               {% if team %}
+                                   {% breadcrumb team.name team.id %}
+                               {% endif %}
+                           {% endif %}
+                      {% endif %}
+                  {% endif %}
+              {% endblock %}
+              {% render_breadcrumbs %}
+          </h2>
+        </div>

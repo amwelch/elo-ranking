@@ -1,98 +1,22 @@
 {% extends "hss_ranking/base.html" %}
-
-{% block header-content %}
-        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-7 col-md-7 col-lg-7 main">
-          <h2 class="page-header">
-              {% load django_bootstrap_breadcrumbs %}
-              {% block breadcrumbs %}
-                  {% if state %}
-                      {% breadcrumb state.name state.id%}
-                      {% if division %}
-                           {% breadcrumb division.name division.id %}
-                           {% if conference %}
-                               {% breadcrumb conference.name conference.id %}
-                               {% if team %}
-                                   {% breadcrumb team.name team.id %}
-                               {% endif %}
-                           {% endif %}
-                      {% endif %}
-                  {% endif %}
-              {% endblock %}
-              {% render_breadcrumbs %}
-          </h2>
-        </div>
-        <div class="col-sm-4 col-md-4 col-lg-4 main">
-          <span>Gameweek Ending:</span>
-          <div id="paginator"></div>
-        </div>
-        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
-          <div class="row placeholders">
-              {% for stat in header_stats %}
-                <div class="col-xs-3 col-sm-3" "col-md-3" "col-lg-3">
-                  {% if stat.delta == "up" %}
-                    <div class="circle circle-border circle-up">
-                      <div class="circle-inner">
-                        <div class="score-text">
-                          <span class="text-info">{{stat.title}}</span>
-                          <br>
-                          <span class="text-info">{{stat.measure}}</span>
-                          <br>
-                          <span class="text-success"><i class="glyphicon glyphicon-arrow-up"></i>{{stat.delta_measure}}</span>
-                        </div>
-                      </div>
-                    </div>
-                  {% elif stat.delta == "down" %}
-                    <div class="circle circle-border circle-down">
-                      <div class="circle-inner">
-                        <div class="score-text">
-                          <span class="text-info">{{stat.title}}</span>
-                          <br>
-                          <span class="text-info">{{stat.measure}}</span>
-                          <br>
-                          <span class="text-danger"><i class="glyphicon glyphicon-arrow-down"></i>{{stat.delta_measure}}</span>
-                        </div>
-                      </div>
-                    </div>
-                  {% else %}
-                    <div class="circle circle-border circle-neutral">
-                      <div class="circle-inner">
-                        <div class="score-text">
-                          <span class="text-info">{{stat.title}}</span>
-                          <br>
-                          <span class="text-info">{{stat.measure}}</span>
-                          <br>
-                          <span class="text-info"><i class="glyphicon glyphicon-minus"></i>{{stat.delta_measure}}</span>
-                        </div>
-                      </div>
-                    </div>
-                  {% endif %}
-                </div>
-              {% endfor %}
-          </div>
-        </div>
-        <div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10 main">
-
 {% block content %}
-{% endblock %}
+        <div class="col-sm-12 col-md-12 col-lg-12 main">
           <div class="table-responsive">
-            <table id="teams-table" class="table table-striped">
+            <table id="table-games" class="table table-striped">
               <thead>
                 <tr>
-                  <th>Id</th>
-                  <th>Rank</th>
-                  <th>Team</th>
-                  <th>Wins</th>
-                  <th>Loses</th>
-                  <th>Elo</th>
+                  {% for col in table.columns %}
+                      <th>{{col}}</th>
+                  {% endfor %}
                 </tr>
               </thead>
               <tbody>
-                {% for r in team_rankings %}
+                {% for r in table.rows %}
+                    <tr>
                     {% for c in r %}
-                        {% cycle '<tr>' '' '' '' '' '' %}
-                           <td>{{c}}</td>
-                        {% cycle '' '' '' '' '' '</tr>' %}
+                        <td>{{c}}</td>
                     {% endfor %}
+                    </tr>
                 {% endfor %}
               </tbody>
             </table>

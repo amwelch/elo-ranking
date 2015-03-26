@@ -31,49 +31,17 @@
   </head>
 
   <body style="display:none">
-
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">SportAnalytics</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Login</a></li>
-            <li><a href="#">About</a></li>
-          </ul>
-          <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
-          </form>
-        </div>
-      </div>
-    </nav>
+    {% include "hss_ranking/navbar.html" %}
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-            {% for category in sidebar_data %}
-              <li>
-                <select multiple data-max-options="1" title="{{category.name}}" id="select-{{category.name}}" data-live-search="true" class="selectpicker" data-width="100%" data-size="5">
-                  {% for option in category.options %}
-                    <option>{{option.name}}</option>
-                  {% endfor %}
-                </select>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+        {% include "hss_ranking/sidebar.html" %}
         <div class="col-sm-9 col-md-10 col-sm-offset-3 col-md-offset-2">
-
-          {% block header-content %}{% endblock %}
-
+          {% include "hss_ranking/header.html" %}
+          {% include "hss_ranking/stat_summary.html" %}
+          {% block content %} {% endblock %}
         </div>
+      </div>
+    </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -98,7 +66,7 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        var team_table = $('#teams-table').dataTable( {
+        var games_table = $('#table-games').dataTable( {
           "order": [[1, "asc"]],
           "columnDefs": [
             { 
@@ -108,13 +76,14 @@
             }
           ]
         });
-        team_table.$('tr').click(function() {
-          var data = team_table.fnGetData(this);
+        games_table.$('tr').click(function() {
+          var data = games_table.fnGetData(this);
           var baseurl = './team/';
           var url = baseurl + data[0] + '/';
           window.location.href = url;
         });
-        $('#schedule-table').DataTable();
+        $('#table-games').DataTable();
+
         var pag_options = {
           offDays: "Mon,Tue,Wed,Thu,Fri,Sat",
           hideOffDays: true,
