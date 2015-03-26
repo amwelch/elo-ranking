@@ -67,22 +67,36 @@ def team_dash(request):
         'team_info': 'foo'
     })
     return HttpResponse(template.render(context))
-def team_drill(request, team_id):
-    template = loader.get_template('hss_ranking/team_drill.html')
+def team(request, team_id):
+
+    template = loader.get_template('hss_ranking/team.html')
     team = Team.objects.get(id=team_id)
     team_info = {}
     team_info['name'] = team.name
-    data = []
+    rows = []
     games = Game.objects.filter(home=team) 
     for game in games:
-        data.append([game.home.name, game.away.name, game.score_home, game.score_away])
+        score = "{} - {}".format(game.score_home, game.score_away)
+        rows.append([game.id, game.home.name, game.away.name, score])
     games = Game.objects.filter(away=team)
     for game in games:
-        data.append([game.home.name, game.away.name, game.score_home, game.score_away])
-    context = RequestContext(request, {
-        'team_schedule': data,
-        'team_info': team_info
-    })
+        score = "{} - {}".format(game.score_home, game.score_away)
+        rows.append([game.id, game.home.name, game.away.name, score])
+
+    table = {}
+    table['columns'] = ['Id', 'Home', 'Away', 'Score']
+    table['rows'] = rows   
+
+    context_data = general_context()
+    context_data.update({
+        'table': table,
+        'endDate': '2015-03-22'
+     })
+    #context = RequestContext(request, {
+    #    'team_schedule': data,
+    #    'team_info': team_info
+    #})
+    context = RequestContext(request, context_data)
     return HttpResponse(template.render(context))
 
 def generate_sidebar_options():
@@ -177,8 +191,8 @@ def get_stats():
     ]
     return stats
 
-def index(request):
-    template = loader.get_template('hss_ranking/index.html')
+def teams(request):
+    template = loader.get_template('hss_ranking/teams.html')
     rows = []
     rank = 1
 
