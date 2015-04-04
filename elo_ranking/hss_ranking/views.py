@@ -151,8 +151,7 @@ def team(request, team_id):
     context_data.update({
         'header_stats': summary_info,
         'table': table,
-        'selected_date': date.strftime("%Y-%m-%d"),
-        'endDate': arrow.utcnow().strftime("%Y-%m-%d")
+        'selected_date': date.strftime("%Y-%m-%d")
      })
     #context = RequestContext(request, {
     #    'team_schedule': data,
@@ -239,6 +238,7 @@ def general_context():
         'state': state,
         'sport': sport,
         'division': division,
+        'endDate': arrow.utcnow().strftime("%Y-%m-%d"),
         'conference': conference,
         'header_stats': get_stats()
     }
@@ -274,24 +274,57 @@ def get_stats():
     ]
     return stats
 
+def num_games(teams):
+    games = 0
+    for team in teams:
+        games += team.wins
+        games += team.loses
+    return games
+
+def get_pctls(teams):
+    df = load_dataframe(teams)['elo']
+    return df.quantile(q=0.75), df.quantile(q=0.5), df.quantile(q=.25)
+
 def teams(request):
     template = loader.get_template('hss_ranking/teams.html')
     rows = []
     rank = 1
 
-    teams = list(Team.objects.all())
+    date = get_date(request)
+    #For delta
+    prev_date = date.replace(days=-7)
+
+    teams = fetch_objs_before(Team, date.datetime)
+    prev_teams = fetch_objs_before(Team, prev_date.datetime)
+
     teams.sort(key=lambda x: x.elo, reverse=True)
     for team in teams:
-        rows.append([team.id, rank, team.name, team.wins, team.loses, team.elo])
+        rows.append([team.id, rank, team.name, team.wins, team.loses, "{0:.2f}".format(team.elo)])
         rank += 1
     table = {}
     table['columns'] = ['Id', 'Rank', 'Name', 'Wins', 'Loses', 'Elo']
     table['rows'] = rows   
 
+    games = num_games(teams)
+    prev_games = num_games(prev_teams)
+
+    pctl_titles = ('75th', 'Median', '25th')
+    pctls = get_pctls(teams)
+    prev_pctls = get_pctls(prev_teams)
+
+    stats = [
+        ('Games', games, games - prev_games),
+    ]
+    for title,pctl,prev_pctl in zip(pctl_titles, pctls, prev_pctls):
+        stats.append((title,pctl,pctl - prev_pctl))
+
+    header_stats = calc_header_stats(stats)
+
     context_data = general_context()
     context_data.update({
+        'header_stats': header_stats,
         'table': table,
-        'endDate': '2015-03-22'
+        'selected_date': date.strftime("%Y-%m-%d")
      })
     context = RequestContext(request, context_data)
     return HttpResponse(template.render(context))
