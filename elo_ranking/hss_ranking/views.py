@@ -21,7 +21,6 @@ def test(request):
     objs = fetch_objs_before(Team, date.datetime)
     df = load_dataframe(objs)
     before =fetch_objs_before(Team, date.replace(days=-7).datetime)
-    
 
 def load_dataframe(qs):
     '''
@@ -41,8 +40,15 @@ def fetch_teams(date):
     prev = date.replace(days=-7)
     prev_set = fetch_objs_before(Team, prev.datetime)
 
-def fetch_objs_before(cls, date):
-    objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
+def fetch_team(date, id):
+    return fetch_objs_before(Team, date.datetime, id=id)[0]
+
+def fetch_objs_before(cls, date, id=None):
+    if id:
+        objs = cls.history.filter(date__lt=date, id=id).values('name').annotate(max_date=Max('date')).order_by()
+    else:
+        objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
+
     rs = []
     for obj in objs:
         tmp = cls.history.filter(date=obj['max_date'], name=obj['name'])
@@ -67,10 +73,19 @@ def team_dash(request):
         'team_info': 'foo'
     })
     return HttpResponse(template.render(context))
-def team(request, team_id):
 
+def get_date(request):
+    date = request.get('date', '')
+    if not date:
+        date = arrow.utcnow()
+    else:
+        date = arrow.get(date)
+    return date
+
+def team(request, team_id):
+    date = get_date(request)
     template = loader.get_template('hss_ranking/team.html')
-    team = Team.objects.get(id=team_id)
+    team = fetch_team(date, id)
     team_info = {}
     team_info['name'] = team.name
     rows = []
