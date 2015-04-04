@@ -40,12 +40,12 @@ def fetch_teams(date):
     prev = date.replace(days=-7)
     prev_set = fetch_objs_before(Team, prev.datetime)
 
-def fetch_team(date, id):
-    return fetch_objs_before(Team, date.datetime, id=id)[0]
+def fetch_team(date, obj_id):
+    return fetch_objs_before(Team, date.datetime, obj_id=obj_id)[0]
 
-def fetch_objs_before(cls, date, id=None):
+def fetch_objs_before(cls, date, obj_id=None):
     if id:
-        objs = cls.history.filter(date__lt=date, id=id).values('name').annotate(max_date=Max('date')).order_by()
+        objs = cls.history.filter(date__lt=date, pk__in=[obj_id]).values('name').annotate(max_date=Max('date')).order_by()
     else:
         objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
 
@@ -74,18 +74,26 @@ def team_dash(request):
     })
     return HttpResponse(template.render(context))
 
+def get_last_sunday(date):
+    #Day 0 is Monday
+    if date.weekday() == 6:
+        return date
+    else:
+        date = date.replace(days= -1*date.weekday() - 1)
+        return date
+
 def get_date(request):
-    date = request.get('date', '')
+    date = request.GET.get('date')
     if not date:
         date = arrow.utcnow()
     else:
         date = arrow.get(date)
-    return date
+    return get_last_sunday(date)
 
 def team(request, team_id):
     date = get_date(request)
     template = loader.get_template('hss_ranking/team.html')
-    team = fetch_team(date, id)
+    team = fetch_team(date, team_id)
     team_info = {}
     team_info['name'] = team.name
     rows = []
@@ -105,7 +113,8 @@ def team(request, team_id):
     context_data = general_context()
     context_data.update({
         'table': table,
-        'endDate': '2015-03-22'
+        'selected_date': date.strftime("%Y-%m-%d"),
+        'endDate': arrow.utcnow().strftime("%Y-%m-%d")
      })
     #context = RequestContext(request, {
     #    'team_schedule': data,
@@ -210,7 +219,6 @@ def teams(request):
     template = loader.get_template('hss_ranking/teams.html')
     rows = []
     rank = 1
-
 
     teams = list(Team.objects.all())
     teams.sort(key=lambda x: x.elo, reverse=True)
