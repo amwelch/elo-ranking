@@ -98,18 +98,27 @@ def calc_spread(name, games):
             spread += game.score_home - game.score_away
         else:
             spread += game.score_away - game.score_home
-    return "%.2f" % (float(spread) / total_games)
+    return float(spread) / total_games
 
-def team(request, team_id):
-    date = get_date(request)
-    template = loader.get_template('hss_ranking/team.html')
-    team = fetch_team(date, team_id)
-    team_info = {}
-    team_info['name'] = team.name
-    rows = []
+def get_team_games(team, date):
     games_home = Game.objects.filter(home=team, date__lt=date.datetime) 
     games_away = Game.objects.filter(away=team, date__lt=date.datetime)
     games = result_list = list(itertools.chain(games_home, games_away))
+    return games
+
+def team(request, team_id):
+    date = get_date(request)
+    #For delta
+    prev_date = date.replace(days=-7)
+
+    template = loader.get_template('hss_ranking/team.html')
+    team = fetch_team(date, team_id)
+    prev_team = fetch_team(prev_date, team_id)
+    team_info = {}
+    team_info['name'] = team.name
+    rows = []
+    games = get_team_games(team, date)
+    prev_games = get_team_games(team, prev_date)
     for game in games:
         score = "{} - {}".format(game.score_home, game.score_away)
         day = game.date.strftime('%Y-%m-%d')
@@ -121,19 +130,23 @@ def team(request, team_id):
     table['rows'] = rows   
 
     rank = request.GET.get("rank", "n/a")
-    rank = request.GET.get("delta_rank", "0")
-    elo = "%.2f" % (team.elo)
+    delta_rank = int(request.GET.get("delta_rank", "0"))
+    elo = team.elo
+    elo_delta = (team.elo - prev_team.elo)
     num_games = len(rows)
+    num_games_delta = num_games - len(prev_games)
     spread = calc_spread(team.name, games)
+    spread_delta = spread - calc_spread(team.name, prev_games)
     
-    # (title, measure, delta)
-    summary_info = [
-        {"title": "Rank", "measure": rank, "delta_measure": "0.0", "delta": "neutral"},
-        {"title": "Elo", "measure": elo, "delta_measure": "20", "delta": "up"},
-        {"title": "Games", "measure": num_games, "delta_measure": "1", "delta": "up"},
-        {"title": "Spread", "measure": spread, "delta_measure": "14.5", "delta": "down"}
+    summary_stats = [
+        ("Rank", rank, delta_rank),
+        ("Elo", elo, elo_delta),
+        ("Games", num_games, num_games_delta),
+        ("Spread", spread, spread_delta)
     ]
-        
+
+    # (title, measure, delta)
+    summary_info = calc_header_stats(summary_stats)
     context_data = general_context()
     context_data.update({
         'header_stats': summary_info,
@@ -147,6 +160,27 @@ def team(request, team_id):
     #})
     context = RequestContext(request, context_data)
     return HttpResponse(template.render(context))
+
+def calc_header_stats(stats):
+    summary_info = []
+    for title, measure, delta in stats:
+        if delta < 0.0:
+            delta_str = "down"
+        elif delta > 0.0:
+            delta_str = "up"
+        else:
+            delta_str = "neutral"
+
+        if "n/a" != measure:
+            measure = "{0:.2f}".format(measure)
+
+        obj = {}
+        obj['title'] = title
+        obj['measure'] = measure
+        obj['delta'] = delta_str
+        obj['delta_measure'] = "{0:.2f}".format(abs(delta))
+        summary_info.append(obj)
+    return summary_info
 
 def generate_sidebar_options():
     sidebar_data = [
