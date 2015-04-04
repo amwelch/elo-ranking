@@ -97,12 +97,12 @@ def team(request, team_id):
     team_info = {}
     team_info['name'] = team.name
     rows = []
-    games = Game.objects.filter(home=team) 
+    games = Game.objects.filter(home=team, date__lt=date.datetime) 
     for game in games:
         score = "{} - {}".format(game.score_home, game.score_away)
         day = game.date.strftime('%Y-%m-%d')
         rows.append([game.id, day, game.home.name, game.away.name, score])
-    games = Game.objects.filter(away=team)
+    games = Game.objects.filter(away=team, date__lt=date.datetime)
     for game in games:
         score = "{} - {}".format(game.score_home, game.score_away)
         day = game.date.strftime('%Y-%m-%d')
