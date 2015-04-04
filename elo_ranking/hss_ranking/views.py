@@ -45,7 +45,7 @@ def fetch_team(date, obj_id):
 
 def fetch_objs_before(cls, date, obj_id=None):
     if obj_id:
-        objs = cls.history.filter(date__lt=date, pk__in=[obj_id]).values('name').annotate(max_date=Max('date')).order_by()
+        objs = cls.history.filter(date__lt=date, id__in=[obj_id]).values('name').annotate(max_date=Max('date')).order_by()
     else:
         objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
 
@@ -90,6 +90,16 @@ def get_date(request):
         date = arrow.get(date)
     return get_last_sunday(date)
 
+def calc_spread(name, games):
+    spread = 0
+    total_games = len(games)
+    for game in games:
+        if name == game.home.name:
+            spread += game.score_home - game.score_away
+        else:
+            spread += game.score_away - game.score_home
+    return "%.2f" % (float(spread) / total_games)
+
 def team(request, team_id):
     date = get_date(request)
     template = loader.get_template('hss_ranking/team.html')
@@ -97,23 +107,36 @@ def team(request, team_id):
     team_info = {}
     team_info['name'] = team.name
     rows = []
-    games = Game.objects.filter(home=team, date__lt=date.datetime) 
+    games_home = Game.objects.filter(home=team, date__lt=date.datetime) 
+    games_away = Game.objects.filter(away=team, date__lt=date.datetime)
+    games = result_list = list(itertools.chain(games_home, games_away))
     for game in games:
         score = "{} - {}".format(game.score_home, game.score_away)
         day = game.date.strftime('%Y-%m-%d')
         rows.append([game.id, day, game.home.name, game.away.name, score])
-    games = Game.objects.filter(away=team, date__lt=date.datetime)
-    for game in games:
-        score = "{} - {}".format(game.score_home, game.score_away)
-        day = game.date.strftime('%Y-%m-%d')
-        rows.append([game.id, day, game.home.name, game.away.name, score])
+    
 
     table = {}
     table['columns'] = ['Id', 'Date', 'Home', 'Away', 'Score']
     table['rows'] = rows   
 
+    rank = request.GET.get("rank", "n/a")
+    rank = request.GET.get("delta_rank", "0")
+    elo = "%.2f" % (team.elo)
+    num_games = len(rows)
+    spread = calc_spread(team.name, games)
+    
+    # (title, measure, delta)
+    summary_info = [
+        {"title": "Rank", "measure": rank, "delta_measure": "0.0", "delta": "neutral"},
+        {"title": "Elo", "measure": elo, "delta_measure": "20", "delta": "up"},
+        {"title": "Games", "measure": num_games, "delta_measure": "1", "delta": "up"},
+        {"title": "Spread", "measure": spread, "delta_measure": "14.5", "delta": "down"}
+    ]
+        
     context_data = general_context()
     context_data.update({
+        'header_stats': summary_info,
         'table': table,
         'selected_date': date.strftime("%Y-%m-%d"),
         'endDate': arrow.utcnow().strftime("%Y-%m-%d")
