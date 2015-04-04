@@ -44,7 +44,7 @@ def fetch_team(date, obj_id):
     return fetch_objs_before(Team, date.datetime, obj_id=obj_id)[0]
 
 def fetch_objs_before(cls, date, obj_id=None):
-    if id:
+    if obj_id:
         objs = cls.history.filter(date__lt=date, pk__in=[obj_id]).values('name').annotate(max_date=Max('date')).order_by()
     else:
         objs = cls.history.filter(date__lt=date).values('name').annotate(max_date=Max('date')).order_by()
@@ -100,14 +100,16 @@ def team(request, team_id):
     games = Game.objects.filter(home=team) 
     for game in games:
         score = "{} - {}".format(game.score_home, game.score_away)
-        rows.append([game.id, game.home.name, game.away.name, score])
+        day = game.date.strftime('%Y-%m-%d')
+        rows.append([game.id, day, game.home.name, game.away.name, score])
     games = Game.objects.filter(away=team)
     for game in games:
         score = "{} - {}".format(game.score_home, game.score_away)
-        rows.append([game.id, game.home.name, game.away.name, score])
+        day = game.date.strftime('%Y-%m-%d')
+        rows.append([game.id, day, game.home.name, game.away.name, score])
 
     table = {}
-    table['columns'] = ['Id', 'Home', 'Away', 'Score']
+    table['columns'] = ['Id', 'Date', 'Home', 'Away', 'Score']
     table['rows'] = rows   
 
     context_data = general_context()
