@@ -139,7 +139,6 @@ def team(request, team_id):
     spread_delta = spread - calc_spread(team.name, prev_games)
     
     summary_stats = [
-        ("Rank", rank, delta_rank),
         ("Elo", elo, elo_delta),
         ("Games", num_games, num_games_delta),
         ("Spread", spread, spread_delta)
