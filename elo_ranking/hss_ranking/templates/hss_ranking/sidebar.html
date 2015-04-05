@@ -1,7 +1,7 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             {% for category in sidebar_data %}
-              <li>
+              <li style="margin-left:10px">
                 <select multiple data-max-options="1" title="{{category.name}}" id="select-{{category.name}}" data-live-search="true" class="selectpicker" data-width="100%" data-size="5">
                   {% for option in category.options %}
                     <option>{{option.name}}</option>
