@@ -35,6 +35,13 @@ def load_dataframe(qs):
 
 #def team_deltas(before, after):
     
+def team_lookup():
+    '''
+    Generate a dict with team names as keys and ids as values
+    '''
+    teams = Team.objects.all()
+    lookup = {team.name: team.id for team in teams}
+    return lookup
 
 def fetch_teams(date):
     prev = date.replace(days=-7)
@@ -213,6 +220,8 @@ def generate_sidebar_options():
     return sidebar_data
 
 def general_context():
+    team_lookup_dict = team_lookup()
+
     state = {
         "name": "Michigan",
         "id": 0
@@ -239,6 +248,7 @@ def general_context():
         'division': division,
         'endDate': arrow.utcnow().strftime("%Y-%m-%d"),
         'conference': conference,
+        'team_lookup_dict': team_lookup_dict,
         'header_stats': get_stats()
     }
     return ret
