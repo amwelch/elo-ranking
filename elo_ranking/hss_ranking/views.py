@@ -16,6 +16,7 @@ def fetch_teams(request):
     scrape.fetch_teams(teams)
     return HttpResponse("Done")
 
+#XXX Scratch space
 def test(request):
     date = arrow.utcnow()
     objs = fetch_objs_before(Team, date.datetime)
@@ -26,8 +27,6 @@ def load_dataframe(qs):
     '''
     QuerySet to dataframe
     '''
-
-#    attrs = Team._meta.get_all_field_names()
     #XXX temporary hack until I flush and migrate the database
     attrs = [x for x in qs[0]._meta.get_all_field_names() if 'history' not in x]
     rs=[[getattr(obj, attr) for attr in attrs if 'history' not in attr] for obj in qs]
@@ -44,6 +43,9 @@ def team_lookup():
     return lookup
 
 def fetch_teams(date):
+    '''
+    
+    '''
     prev = date.replace(days=-7)
     prev_set = fetch_objs_before(Team, prev.datetime)
 
@@ -344,5 +346,5 @@ def make_options(objs, name):
         "options": []
     }
     for obj in objs:
-        ret['options'].append({'name': obj.name, 'id': obj.id})
+        ret['options'].append({'name': str(obj.name), 'id': str(obj.id)})
     return ret

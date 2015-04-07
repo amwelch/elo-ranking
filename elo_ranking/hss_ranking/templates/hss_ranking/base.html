@@ -65,6 +65,7 @@
 </html>
 
 <script type="text/javascript">
+    var team_lookup = "{{team_lookup_dict}}";
     $(document).ready(function () {
         var games_table = $('#table-games').dataTable( {
           "order": [[1, "asc"]],
@@ -97,6 +98,12 @@
           size: "small"
         };
         console.log(pag_options);
+        $('#select-Team').on("change", function(e) { 
+            var id = $('#select-Team').val();
+            console.log('id', id);
+            var url = 'http://' + window.location.host + "/hss/team/" + id;
+            window.location.href = url;
+        });
         $('#paginator').datepaginator(pag_options);
         $('#paginator').on('selectedDateChanged', function(event, date) {
             var params = "?date=" + date.unix();
